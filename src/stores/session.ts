@@ -9,6 +9,7 @@ export interface SessionConfig {
   username: string
   password: string
   group?: string
+  order?: number
   createdAt: number
   updatedAt: number
 }
@@ -44,5 +45,23 @@ export const useSessionStore = defineStore('session', () => {
     return Array.from(groups)
   }
 
-  return { sessions, loading, loadSessions, saveSession, deleteSession, getGroups }
+  async function reorderSessions(fromIndex: number, toIndex: number) {
+    const items = [...sessions.value]
+    const [moved] = items.splice(fromIndex, 1)
+    items.splice(toIndex, 0, moved)
+    
+    // Update order values
+    items.forEach((item, index) => {
+      item.order = index
+    })
+    
+    // Save all sessions with new order
+    for (const item of items) {
+      await window.electronAPI.saveSession(item)
+    }
+    
+    await loadSessions()
+  }
+
+  return { sessions, loading, loadSessions, saveSession, deleteSession, getGroups, reorderSessions }
 })

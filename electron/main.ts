@@ -1,7 +1,7 @@
-import { app, BrowserWindow, ipcMain, dialog } from 'electron'
-import { join } from 'path'
-import { Client, SFTPWrapper } from 'ssh2'
-import Store from 'electron-store'
+const { app, BrowserWindow, ipcMain, dialog } = require('electron')
+const { join } = require('path')
+const { Client } = require('ssh2')
+const Store = require('electron-store')
 
 const store = new Store()
 

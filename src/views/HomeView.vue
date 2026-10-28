@@ -39,11 +39,20 @@
           
           <div v-show="expandedGroups.includes(group.name)" class="group-sessions">
             <div
-              v-for="session in group.sessions"
+              v-for="(session, index) in group.sessions"
               :key="session.id"
               class="session-item"
+              :class="{ 
+                selected: selectedSession?.id === session.id,
+                dragging: draggingSession?.id === session.id,
+                'drag-over': dragOverIndex === index && dragOverGroup === group.name
+              }"
+              draggable="true"
               @click="selectSession(session)"
-              :class="{ selected: selectedSession?.id === session.id }"
+              @dragstart="handleDragStart(session, index, group.name)"
+              @dragend="handleDragEnd"
+              @dragover.prevent="handleDragOver(index, group.name)"
+              @drop="handleDrop(index, group.name)"
             >
               <div class="session-info">
                 <div class="session-name">{{ session.name }}</div>
@@ -164,6 +173,13 @@ const editingSession = ref<SessionConfig | null>(null)
 const selectedSession = ref<SessionConfig | null>(null)
 const expandedGroups = ref<string[]>([])
 
+// Drag and drop state
+const draggingSession = ref<SessionConfig | null>(null)
+const draggingIndex = ref<number>(-1)
+const draggingGroup = ref<string>('')
+const dragOverIndex = ref<number>(-1)
+const dragOverGroup = ref<string>('')
+
 const sessionForm = ref({
   name: '',
   host: '',
@@ -205,6 +221,40 @@ function toggleGroup(name: string) {
   } else {
     expandedGroups.value.push(name)
   }
+}
+
+// Drag and drop handlers
+function handleDragStart(session: SessionConfig, index: number, groupName: string) {
+  draggingSession.value = session
+  draggingIndex.value = index
+  draggingGroup.value = groupName
+}
+
+function handleDragEnd() {
+  draggingSession.value = null
+  draggingIndex.value = -1
+  draggingGroup.value = ''
+  dragOverIndex.value = -1
+  dragOverGroup.value = ''
+}
+
+function handleDragOver(index: number, groupName: string) {
+  dragOverIndex.value = index
+  dragOverGroup.value = groupName
+}
+
+async function handleDrop(targetIndex: number, targetGroup: string) {
+  if (!draggingSession.value) return
+  
+  const sourceIndex = draggingIndex.value
+  const sourceGroup = draggingGroup.value
+  
+  // Only handle reordering within the same group for now
+  if (sourceGroup === targetGroup && sourceIndex !== targetIndex) {
+    await sessionStore.reorderSessions(sourceIndex, targetIndex)
+  }
+  
+  handleDragEnd()
 }
 
 function showAddDialog() {
@@ -471,6 +521,16 @@ function closeWindow() {
 
 .session-item.selected {
   background: #094771;
+}
+
+.session-item.dragging {
+  opacity: 0.5;
+  background: #1e1e1e;
+}
+
+.session-item.drag-over {
+  border-top: 2px solid #007acc;
+  margin-top: 0;
 }
 
 .session-info {
