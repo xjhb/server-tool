@@ -26,8 +26,8 @@ function createWindow() {
       contextIsolation: true,
       nodeIntegration: false
     },
-    titleBarStyle: 'hidden',
-    frame: true
+    frame: false,
+    titleBarStyle: 'hidden'
   })
 
   if (process.env.VITE_DEV_SERVER_URL) {
@@ -40,6 +40,23 @@ function createWindow() {
     mainWindow = null
   })
 }
+
+// Window control IPC handlers
+ipcMain.handle('window:minimize', () => {
+  mainWindow?.minimize()
+})
+
+ipcMain.handle('window:close', () => {
+  mainWindow?.close()
+})
+
+ipcMain.handle('window:maximize', () => {
+  if (mainWindow?.isMaximized()) {
+    mainWindow.unmaximize()
+  } else {
+    mainWindow?.maximize()
+  }
+})
 
 app.whenReady().then(createWindow)
 

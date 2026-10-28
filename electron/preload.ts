@@ -29,5 +29,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   },
   onSSHClose: (callback: (sessionId: string) => void) => {
     ipcRenderer.on('ssh:close', (event, sessionId) => callback(sessionId))
-  }
+  },
+
+  windowMinimize: () => ipcRenderer.invoke('window:minimize'),
+  windowClose: () => ipcRenderer.invoke('window:close'),
+  windowMaximize: () => ipcRenderer.invoke('window:maximize')
 })

@@ -37,7 +37,7 @@
     "appId": "com.servertoll.app",
     "productName": "ServerTool",
     "directories": {
-      "output": "release"
+      "output": "build-output"
     },
     "files": [
       "dist/**/*",
@@ -45,6 +45,18 @@
     ],
     "win": {
       "target": "nsis"
+    },
+    "mac": {
+      "target": "dmg"
+    },
+    "linux": {
+      "target": "AppImage"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
     }
   },
   "allowScripts": {}

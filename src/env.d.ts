@@ -25,5 +25,8 @@ interface Window {
     onSSHData: (callback: (data: any) => void) => void
     onSSHError: (callback: (error: any) => void) => void
     onSSHClose: (callback: (sessionId: string) => void) => void
+    windowMinimize: () => Promise<void>
+    windowClose: () => Promise<void>
+    windowMaximize: () => Promise<void>
   }
 }

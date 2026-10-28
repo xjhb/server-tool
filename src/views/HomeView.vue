@@ -1,5 +1,23 @@
 <template>
   <div class="home-container">
+    <!-- Custom Title Bar -->
+    <div class="title-bar">
+      <div class="title-bar-drag">
+        <span class="title-bar-text">ServerTool - Linux 服务器连接工具</span>
+      </div>
+      <div class="title-bar-controls">
+        <button class="control-btn minimize" @click="minimizeWindow" title="最小化">
+          <el-icon><Minus /></el-icon>
+        </button>
+        <button class="control-btn maximize" @click="maximizeWindow" title="最大化">
+          <el-icon><FullScreen /></el-icon>
+        </button>
+        <button class="control-btn close" @click="closeWindow" title="关闭">
+          <el-icon><Close /></el-icon>
+        </button>
+      </div>
+    </div>
+
     <div class="sidebar">
       <div class="sidebar-header">
         <h2>服务器列表</h2>
@@ -131,7 +149,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { Plus, CaretRight, More, Close, Monitor, Folder } from '@element-plus/icons-vue'
+import { Plus, CaretRight, More, Close, Monitor, Folder, Minus, FullScreen } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useSessionStore, type SessionConfig } from '@/stores/session'
 import { useTabStore, type Tab } from '@/stores/tab'
@@ -286,13 +304,80 @@ async function closeTab(id: string) {
     tabStore.removeTab(id)
   }
 }
+
+function minimizeWindow() {
+  window.electronAPI.windowMinimize()
+}
+
+function maximizeWindow() {
+  window.electronAPI.windowMaximize()
+}
+
+function closeWindow() {
+  window.electronAPI.windowClose()
+}
 </script>
 
 <style scoped>
 .home-container {
   display: flex;
+  flex-direction: column;
   height: 100vh;
   background: #1e1e1e;
+}
+
+.title-bar {
+  height: 32px;
+  background: #252526;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  -webkit-app-region: drag;
+  flex-shrink: 0;
+}
+
+.title-bar-drag {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding-left: 12px;
+}
+
+.title-bar-text {
+  font-size: 12px;
+  color: #d4d4d4;
+  user-select: none;
+}
+
+.title-bar-controls {
+  display: flex;
+  -webkit-app-region: no-drag;
+}
+
+.control-btn {
+  width: 46px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: #d4d4d4;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.control-btn:hover {
+  background: #3e3e42;
+}
+
+.control-btn.close:hover {
+  background: #e81123;
+  color: white;
+}
+
+.control-btn .el-icon {
+  font-size: 14px;
 }
 
 .sidebar {
