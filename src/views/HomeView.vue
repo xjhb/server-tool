@@ -81,7 +81,7 @@
 
       <div class="tab-content">
         <div v-for="tab in tabStore.tabs" v-show="tab.active" :key="tab.id" class="tab-panel">
-          <TerminalPanel v-if="tab.type === 'terminal'" :tab="tab" />
+          <TerminalPanel v-if="tab.type === 'terminal'" :tab="tab" @close="closeTab" />
           <SftpPanel v-else :tab="tab" />
         </div>
         

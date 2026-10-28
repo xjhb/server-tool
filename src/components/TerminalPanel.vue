@@ -1,5 +1,19 @@
 <template>
   <div class="terminal-container" ref="terminalContainer">
+    <div class="terminal-toolbar">
+      <div class="toolbar-left">
+        <span class="toolbar-title">{{ tab.config.name }} - {{ tab.config.host }}</span>
+        <span class="toolbar-status" :class="{ connected: !loading }">
+          {{ loading ? '连接中...' : '已连接' }}
+        </span>
+      </div>
+      <div class="toolbar-right">
+        <el-button type="danger" size="small" @click="disconnect">
+          <el-icon><SwitchButton /></el-icon>
+          断开连接
+        </el-button>
+      </div>
+    </div>
     <div class="terminal-loading" v-if="loading">
       <el-icon class="loading-icon"><Loading /></el-icon>
       <span>正在连接...</span>
@@ -10,7 +24,8 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch } from 'vue'
-import { Loading } from '@element-plus/icons-vue'
+import { Loading, SwitchButton } from '@element-plus/icons-vue'
+import { ElMessageBox } from 'element-plus'
 import { Terminal } from '@xterm/xterm'
 import { FitAddon } from '@xterm/addon-fit'
 import { WebLinksAddon } from '@xterm/addon-web-links'
@@ -19,6 +34,10 @@ import type { Tab } from '@/stores/tab'
 
 const props = defineProps<{
   tab: Tab
+}>()
+
+const emit = defineEmits<{
+  close: [tabId: string]
 }>()
 
 const terminalRef = ref<HTMLDivElement>()
@@ -139,6 +158,15 @@ async function initTerminal() {
   }
 }
 
+async function disconnect() {
+  try {
+    await ElMessageBox.confirm('确定要断开连接吗？', '提示', {
+      type: 'warning'
+    })
+    emit('close', props.tab.id)
+  } catch {}
+}
+
 function cleanup() {
   resizeObserver?.disconnect()
   term?.dispose()
@@ -156,11 +184,55 @@ function nextTick() {
   width: 100%;
   position: relative;
   background: #1e1e1e;
+  display: flex;
+  flex-direction: column;
+}
+
+.terminal-toolbar {
+  height: 40px;
+  background: #252526;
+  border-bottom: 1px solid #3e3e42;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  flex-shrink: 0;
+}
+
+.toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.toolbar-title {
+  font-size: 13px;
+  color: #d4d4d4;
+  font-weight: 500;
+}
+
+.toolbar-status {
+  font-size: 12px;
+  color: #858585;
+  padding: 2px 8px;
+  background: #3e3e42;
+  border-radius: 10px;
+}
+
+.toolbar-status.connected {
+  color: #23d18b;
+  background: rgba(35, 209, 139, 0.1);
+}
+
+.toolbar-right {
+  display: flex;
+  align-items: center;
 }
 
 .terminal {
-  height: 100%;
+  flex: 1;
   width: 100%;
+  overflow: hidden;
 }
 
 .terminal-loading {
