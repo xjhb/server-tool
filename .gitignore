@@ -13,6 +13,9 @@ out/
 build-output/
 dist-release/
 
+# Allow releases directory
+!releases/
+
 # Logs
 *.log
 npm-debug.log*
